@@ -7,4 +7,5 @@ module org.example.course {
     exports org.example.course;
     exports org.example.course.gui;
     opens org.example.course.gui to javafx.fxml;
+    opens org.example.course.model.entities to javafx.base;
 }
