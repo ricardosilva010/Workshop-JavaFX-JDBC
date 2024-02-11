@@ -88,6 +88,7 @@ public class DepartmentListController implements Initializable
 
             DepartmentFormController controller = fxmlLoader.getController();
             controller.setDepartment(department);
+            controller.setDepartmentService(new DepartmentService());
             controller.updateFormData();
 
             Stage dialogStage = new Stage();
