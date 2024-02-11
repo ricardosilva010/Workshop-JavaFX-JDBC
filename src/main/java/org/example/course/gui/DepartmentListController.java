@@ -16,6 +16,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.example.course.Main;
+import org.example.course.gui.listeners.DataChangeListener;
 import org.example.course.gui.utils.Alerts;
 import org.example.course.gui.utils.Utils;
 import org.example.course.model.entities.Department;
@@ -26,7 +27,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class DepartmentListController implements Initializable
+public class DepartmentListController implements Initializable, DataChangeListener
 {
     private DepartmentService departmentService;
     private ObservableList<Department> observableList;
@@ -89,6 +90,7 @@ public class DepartmentListController implements Initializable
             DepartmentFormController controller = fxmlLoader.getController();
             controller.setDepartment(department);
             controller.setDepartmentService(new DepartmentService());
+            controller.subscribeDataChangeListener(this);
             controller.updateFormData();
 
             Stage dialogStage = new Stage();
@@ -103,5 +105,11 @@ public class DepartmentListController implements Initializable
         {
             Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(), Alert.AlertType.ERROR);
         }
+    }
+
+    @Override
+    public void onDataChanged()
+    {
+        updateTableView();
     }
 }
