@@ -13,12 +13,11 @@ import org.example.course.gui.utils.Alerts;
 import org.example.course.gui.utils.Constraints;
 import org.example.course.gui.utils.Utils;
 import org.example.course.model.entities.Department;
+import org.example.course.model.exceptions.ValidationException;
 import org.example.course.model.services.DepartmentService;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class DepartmentFormController implements Initializable
 {
@@ -74,14 +73,29 @@ public class DepartmentFormController implements Initializable
         {
             Alerts.showAlert("Error saving object", null, e.getMessage(), Alert.AlertType.ERROR);
         }
+        catch (ValidationException e)
+        {
+            setErrorMessages(e.getErrors());
+        }
     }
 
     private Department getFormData()
     {
         Department department = new Department();
 
+        ValidationException validationException = new ValidationException("Validation error");
+
         department.setId(Utils.tryParseToInt(txtId.getText()));
+        if (txtName.getText() == null || txtName.getText().trim().isEmpty())
+        {
+            validationException.addError("name", "Field can't be empty");
+        }
         department.setName(txtName.getText());
+
+        if (!validationException.getErrors().isEmpty())
+        {
+            throw validationException;
+        }
 
         return department;
     }
@@ -120,5 +134,15 @@ public class DepartmentFormController implements Initializable
         }
         txtId.setText(String.valueOf(department.getId()));
         txtName.setText(department.getName());
+    }
+
+    private void setErrorMessages(Map<String, String> errors)
+    {
+        Set<String> fields = errors.keySet();
+
+        if (fields.contains("name"))
+        {
+            labelErrorName.setText(errors.get("name"));
+        }
     }
 }
