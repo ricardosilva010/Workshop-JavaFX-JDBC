@@ -3,10 +3,7 @@ package org.example.course.gui;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import org.example.course.db.DbException;
 import org.example.course.gui.listeners.DataChangeListener;
 import org.example.course.gui.utils.Alerts;
@@ -21,7 +18,7 @@ import java.util.*;
 
 public class SellerFormController implements Initializable
 {
-    private Seller Seller;
+    private Seller seller;
     private SellerService SellerService;
     private List<DataChangeListener> dataChangeListeners = new ArrayList<>();
 
@@ -30,7 +27,19 @@ public class SellerFormController implements Initializable
     @FXML
     private TextField txtName;
     @FXML
+    private TextField txtEmail;
+    @FXML
+    private DatePicker dpBirthDate;
+    @FXML
+    private TextField txtBaseSalary;
+    @FXML
     private Label labelErrorName;
+    @FXML
+    private Label labelErrorEmail;
+    @FXML
+    private Label labelErrorBirthDate;
+    @FXML
+    private Label labelErrorBaseSalary;
     @FXML
     private Button btSave;
     @FXML
@@ -38,7 +47,7 @@ public class SellerFormController implements Initializable
 
     public void setSeller(Seller Seller)
     {
-        this.Seller = Seller;
+        this.seller = Seller;
     }
 
     public void setSellerService(SellerService SellerService)
@@ -54,7 +63,7 @@ public class SellerFormController implements Initializable
     @FXML
     public void onBtSaveAction(ActionEvent event)
     {
-        if (Seller == null)
+        if (seller == null)
         {
             throw new IllegalStateException("Entity was null");
         }
@@ -64,8 +73,8 @@ public class SellerFormController implements Initializable
         }
         try
         {
-            Seller = getFormData();
-            SellerService.saveOrUpdate(Seller);
+            seller = getFormData();
+            SellerService.saveOrUpdate(seller);
             notifyDataChangeListeners();
             Utils.currentStage(event).close();
         }
@@ -123,17 +132,27 @@ public class SellerFormController implements Initializable
     private void initializeNodes()
     {
         Constraints.setTextFieldInteger(txtId);
-        Constraints.setTextFieldMaxLength(txtName, 30);
+        Constraints.setTextFieldMaxLength(txtName, 75);
+        Constraints.setTextFieldMaxLength(txtEmail, 50);
+        Utils.formatDatePicker(dpBirthDate, "dd/MM/yyyy");
+        Constraints.setTextFieldDouble(txtBaseSalary);
     }
 
     public void updateFormData()
     {
-        if (Seller == null)
+        if (seller == null)
         {
             throw new IllegalStateException("Entity was null");
         }
-        txtId.setText(String.valueOf(Seller.getId()));
-        txtName.setText(Seller.getName());
+        txtId.setText(String.valueOf(seller.getId()));
+        txtName.setText(seller.getName());
+        txtEmail.setText(seller.getEmail());
+        if (seller.getBirthDate() != null)
+        {
+            dpBirthDate.setValue(seller.getBirthDate());
+        }
+        Locale.setDefault(Locale.US);
+        txtBaseSalary.setText(String.format("%.2f", seller.getBaseSalary()));
     }
 
     private void setErrorMessages(Map<String, String> errors)
