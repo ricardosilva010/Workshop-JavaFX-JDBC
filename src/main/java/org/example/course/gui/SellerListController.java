@@ -19,6 +19,7 @@ import org.example.course.gui.listeners.DataChangeListener;
 import org.example.course.gui.utils.Alerts;
 import org.example.course.gui.utils.Utils;
 import org.example.course.model.entities.Seller;
+import org.example.course.model.services.DepartmentService;
 import org.example.course.model.services.SellerService;
 
 import java.io.IOException;
@@ -107,7 +108,8 @@ public class SellerListController implements Initializable, DataChangeListener
 
             SellerFormController controller = fxmlLoader.getController();
             controller.setSeller(seller);
-            controller.setSellerService(new SellerService());
+            controller.setServices(new SellerService(), new DepartmentService());
+            controller.loadAssociatedObjects();
             controller.subscribeDataChangeListener(this);
             controller.updateFormData();
 
@@ -121,6 +123,7 @@ public class SellerListController implements Initializable, DataChangeListener
         }
         catch (IOException e)
         {
+            e.printStackTrace();
             Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(), Alert.AlertType.ERROR);
         }
     }
