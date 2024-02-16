@@ -19,6 +19,9 @@ import org.example.course.model.services.DepartmentService;
 import org.example.course.model.services.SellerService;
 
 import java.net.URL;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 public class SellerFormController implements Initializable
@@ -100,23 +103,47 @@ public class SellerFormController implements Initializable
 
     private Seller getFormData()
     {
-        Seller Seller = new Seller();
+        Seller seller = new Seller();
 
         ValidationException validationException = new ValidationException("Validation error");
 
-        Seller.setId(Utils.tryParseToInt(txtId.getText()));
+        seller.setId(Utils.tryParseToInt(txtId.getText()));
         if (txtName.getText() == null || txtName.getText().trim().isEmpty())
         {
             validationException.addError("name", "Field can't be empty");
         }
-        Seller.setName(txtName.getText());
+        seller.setName(txtName.getText());
+
+        if (txtEmail.getText() == null || txtEmail.getText().trim().isEmpty())
+        {
+            validationException.addError("email", "Field can't be empty");
+        }
+        seller.setEmail(txtEmail.getText());
+
+        if (dpBirthDate.getValue() == null)
+        {
+            validationException.addError("birthDate", "Field can't be empty");
+        }
+        else
+        {
+            Instant instant = Instant.from(dpBirthDate.getValue().atStartOfDay(ZoneId.systemDefault()));
+            seller.setBirthDate(LocalDate.from(instant.atZone(ZoneId.systemDefault())));
+        }
+
+        if (txtBaseSalary.getText() == null || txtBaseSalary.getText().trim().isEmpty())
+        {
+            validationException.addError("baseSalary", "Field can't be empty");
+        }
+        seller.setBaseSalary(Utils.tryParseToDouble(txtBaseSalary.getText()));
+
+        seller.setDepartment(comboBoxDepartment.getValue());
 
         if (!validationException.getErrors().isEmpty())
         {
             throw validationException;
         }
 
-        return Seller;
+        return seller;
     }
 
     private void notifyDataChangeListeners()
@@ -189,10 +216,10 @@ public class SellerFormController implements Initializable
     {
         Set<String> fields = errors.keySet();
 
-        if (fields.contains("name"))
-        {
-            labelErrorName.setText(errors.get("name"));
-        }
+        labelErrorName.setText(fields.contains("name") ? errors.get("name") : "");
+        labelErrorEmail.setText(fields.contains("email") ? errors.get("email") : "");
+        labelErrorBirthDate.setText(fields.contains("birthDate") ? errors.get("birthDate") : "");
+        labelErrorBaseSalary.setText(fields.contains("baseSalary") ? errors.get("baseSalary") : "");
     }
 
     private void initializeComboBoxDepartment()
